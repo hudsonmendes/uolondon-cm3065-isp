@@ -13,6 +13,3 @@ function setup() {
 function draw() {
   player.draw()
 }
-
-window.setup = setup;
-window.draw = draw;
