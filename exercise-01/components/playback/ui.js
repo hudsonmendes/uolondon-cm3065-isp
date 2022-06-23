@@ -1,4 +1,6 @@
-class Playback extends Drawable {
+import Drawable from '../drawable'
+
+export default class Playback extends Drawable {
     constructor() {
         super();
         // binds

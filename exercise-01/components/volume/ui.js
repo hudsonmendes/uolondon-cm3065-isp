@@ -1,4 +1,6 @@
-class Volume extends Drawable {
+import Drawable from '../drawable'
+
+export default class Volume extends Drawable {
     constructor() {
         super();
         // binds

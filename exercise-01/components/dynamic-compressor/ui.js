@@ -1,4 +1,6 @@
-class DynamicCompressor extends Drawable {
+import Drawable from '../drawable'
+
+export default class DynamicCompressorUI extends Drawable {
     constructor() {
         super();
         // binds

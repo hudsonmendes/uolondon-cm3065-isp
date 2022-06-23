@@ -1,4 +1,6 @@
-class Pipeline extends Step {
+import Fitler from './filter'
+
+export default class Pipeline extends Fitler {
     constructor() {
     }
 

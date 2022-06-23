@@ -1,4 +1,6 @@
-class Reverb extends Drawable {
+import Drawable from '../drawable'
+
+export default class Reverb extends Drawable {
     constructor() {
         super();
         // binds

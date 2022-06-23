@@ -1,4 +1,6 @@
-class WaveShifter extends Drawable {
+import Drawable from '../drawable'
+
+export default class WaveShifter extends Drawable {
     constructor() {
         super();
         // binds

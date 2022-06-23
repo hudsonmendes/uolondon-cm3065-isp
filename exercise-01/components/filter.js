@@ -1,6 +1,6 @@
-class Step {
+export default class Fitler {
     constructor() {
-        if (new.target === Step)
+        if (new.target === Fitler)
             throw new TypeError('Cannot construct abstract class');
     }
 
