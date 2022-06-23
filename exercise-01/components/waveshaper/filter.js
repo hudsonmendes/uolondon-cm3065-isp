@@ -1,5 +1,3 @@
-import Filter from '../filter'
-
-export default class WaveShaperFilter extends Filter {
+class WaveShaperFilter extends Filter {
     
 }

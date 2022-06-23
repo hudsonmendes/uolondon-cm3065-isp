@@ -1,6 +1,4 @@
-import Drawable from '../drawable'
-
-export default class Reverb extends Drawable {
+class ReverbUI extends Drawable {
     constructor() {
         super();
         // binds

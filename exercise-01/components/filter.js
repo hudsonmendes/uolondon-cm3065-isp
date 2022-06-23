@@ -1,6 +1,6 @@
-export default class Fitler {
+class Filter {
     constructor() {
-        if (new.target === Fitler)
+        if (new.target === Filter)
             throw new TypeError('Cannot construct abstract class');
     }
 

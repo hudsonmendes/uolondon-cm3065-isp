@@ -1,5 +1,3 @@
-import Filter from '../filter'
-
-export default class ReverbFilter extends Filter {
+class ReverbFilter extends Filter {
     
 }

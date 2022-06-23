@@ -1,6 +1,4 @@
-import Drawable from '../drawable'
-
-export default class LowPass extends Drawable {
+class LowpassUI extends Drawable {
     constructor() {
         super();
         // binds

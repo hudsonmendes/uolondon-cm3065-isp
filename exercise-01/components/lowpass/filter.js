@@ -1,5 +1,3 @@
-import Filter from '../filter'
-
-export default class LowpassFilter extends Filter {
+class LowpassFilter extends Filter {
     
 }

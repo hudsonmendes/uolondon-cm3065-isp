@@ -1,7 +1,4 @@
-import Drawable from '../drawable'
-import SpectrumUI from './ui-spectrum'
-
-export default class Spectrums extends Drawable {
+class Spectrums extends Drawable {
     constructor() {
         super();
         // binds

@@ -1,5 +1,3 @@
-import Filter from '../filter'
-
-export default class DynamicCompressorFilter extends Filter {
+class DynamicCompressorFilter extends Filter {
     
 }

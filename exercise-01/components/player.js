@@ -1,12 +1,4 @@
-import Drawable from './drawable'
-import { PlaybackUI } from './playback'
-import { LowpassUI } from './lowpass'
-import { DynamicCompressorUI } from './dynamic-compressor'
-import { VolumeUI } from './volume'
-import { ReverbUI } from './reverb'
-import { WaveShifterUI } from './wave-shifter'
-
-export default class Player extends Drawable {
+class Player extends Drawable {
     constructor() {
         super();
         // binds
@@ -17,7 +9,7 @@ export default class Player extends Drawable {
         this.dynamicCompressor = new DynamicCompressorUI()
         this.volume = new VolumeUI();
         this.reverb = new ReverbUI();
-        this.waveShifter = new WaveShifterUI()
+        this.waveShaper = new WaveShaperUI()
     }
 
     draw() {
@@ -26,6 +18,6 @@ export default class Player extends Drawable {
         this.dynamicCompressor.draw();
         this.volume.draw();
         this.reverb.draw();
-        this.waveShifter.draw();
+        this.waveShaper.draw();
     }
 }

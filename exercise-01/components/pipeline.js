@@ -1,6 +1,4 @@
-import Fitler from './filter'
-
-export default class Pipeline extends Fitler {
+class Pipeline extends Filter {
     constructor() {
     }
 

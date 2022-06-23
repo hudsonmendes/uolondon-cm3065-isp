@@ -1,6 +1,4 @@
-import Drawable from '../drawable'
-
-export default class WaveShifter extends Drawable {
+class WaveShaperUI extends Drawable {
     constructor() {
         super();
         // binds

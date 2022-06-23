@@ -1,10 +1,9 @@
-import Drawable from '../drawable'
-
-export default class Playback extends Drawable {
+class PlaybackUI extends Drawable {
     constructor() {
         super();
         // binds
         this.draw = this.draw.bind(this)
+        this.onPauseClick = this.onPauseClick.bind(this)
         // Playback controls
         this.pauseButton = null;
         this.playButton = null;
@@ -19,6 +18,7 @@ export default class Playback extends Drawable {
         // Playback controls
         this.pauseButton = createButton('pause');
         this.pauseButton.position(10, 20);
+        this.pauseButton.mouseClicked(this.onPauseClick);
         this.playButton = createButton('play');
         this.playButton.position(70, 20);
         this.stopButton = createButton('stop');
@@ -31,5 +31,9 @@ export default class Playback extends Drawable {
         this.loopButton.position(352, 20);
         this.recordButton = createButton('record');
         this.recordButton.position(402, 20);
+    }
+
+    onPauseClick() {
+        console.log("pause");
     }
 }

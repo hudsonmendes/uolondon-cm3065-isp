@@ -1,4 +1,4 @@
-export default class Drawable {
+class Drawable {
     constructor() {
         if (new.target === Drawable)
             throw new TypeError('Cannot construct abstract class');
