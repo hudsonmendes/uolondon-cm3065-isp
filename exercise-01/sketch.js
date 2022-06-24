@@ -2,12 +2,18 @@
 // Feel freee to modify it or create your own template
 
 // playback controls
-let player;
+let sound;
+
+function preload() {
+  sound = loadSound('./assets/sound.mp3');
+}
 
 function setup() {
   createCanvas(800, 600);
-  background(180);
-  player = new Player();
+  background(235);
+  
+  player = new Player({sound});
+  player.setup()
 }
 
 function draw() {
