@@ -25,37 +25,37 @@ class PlaybackUI extends Drawable {
     }
 
     setup() {
+        // Playback controls
         this.pauseButton = createButton('pause');
+        this.pauseButton.position(10, 20);
         this.pauseButton.mouseClicked(this.onPauseClick);
 
         this.playButton = createButton('play');
+        this.playButton.position(70, 20);
         this.playButton.mouseClicked(this.onPlayClick);
 
         this.stopButton = createButton('stop');
+        this.stopButton.position(120, 20);
         this.stopButton.mouseClicked(this.onStopClick);
 
         this.skipStartButton = createButton('skip to start');
+        this.skipStartButton.position(170, 20);
         this.skipStartButton.mouseClicked(this.onSkipStartClick);
 
         this.skipEndButton = createButton('skip to end');
+        this.skipEndButton.position(263, 20);
         this.skipEndButton.mouseClicked(this.onSkipEndClick);
 
         this.loopButton = createButton('loop');
+        this.loopButton.position(352, 20);
         this.loopButton.mouseClicked(this.onLoopClick);
 
         this.recordButton = createButton('record');
+        this.recordButton.position(402, 20);
         this.recordButton.mouseClicked(this.onRecordClick);
     }
 
     draw() {
-        // Playback controls
-        this.pauseButton.position(10, 20);
-        this.playButton.position(70, 20);
-        this.stopButton.position(120, 20);
-        this.skipStartButton.position(170, 20);
-        this.skipEndButton.position(263, 20);
-        this.loopButton.position(352, 20);
-        this.recordButton.position(402, 20);
     }
 
     onPauseClick() {

@@ -8,6 +8,11 @@ class Spectrums extends Drawable {
         this.spectrumOut = new SpectrumUI({ title: 'spectrum out', x: 560, y: 345 });
     }
 
+    setup() {
+        this.spectrumIn.setup();
+        this.spectrumOut.setup();
+    }
+
     draw() {
         this.spectrumIn.draw();
         this.spectrumOut.draw();

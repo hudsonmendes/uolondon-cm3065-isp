@@ -9,7 +9,7 @@
             "request": "launch",
             "type": "chrome",
             "url": "http://localhost:8887",
-            "webRoot": "${workspaceFolder}/exercise-01/"
+            "webRoot": "${workspaceFolder}/"
         }
     ]
 }
