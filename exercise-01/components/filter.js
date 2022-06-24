@@ -4,7 +4,7 @@ class Filter {
             throw new TypeError('Cannot construct abstract class');
     }
 
-    process(input) {
-        throw new Error('draw() not implemented');
+    process(x) {
+        throw new Error('process() not implemented');
     }
 }

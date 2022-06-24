@@ -1,3 +1,5 @@
+const BROADCAST = 'broadcast'
+
 class Drawable {
     constructor() {
         if (new.target === Drawable)
@@ -19,23 +21,37 @@ class Drawable {
         throw new Error('draw() not implemented');
     }
 
+    addEventListener(listener) {
+        this.addEventListener(BROADCAST, listener);
+    }
+
     addEventListener(type, listener) {
         if (!this.listeners[type])
             this.listeners[type] = [];
-        this.listeners.push(listener);
+        if (type !== BROADCAST)
+            this.listeners[type].push(listener);
+        this.listeners[BROADCAST].push(listener);
         return this;
+    }
+
+    removeEventListener(listener) {
+        this.removeEventListener(BROADCAST, listener);
     }
 
     removeEventListener(type, listener) {
         if (!this.listeners[type])
             return this;
-        this.listeners[type].splice(this.listeners[type].indexOf(listener), 1);
+        if (type !== BROADCAST)
+            this.listeners[type].splice(this.listeners[type].indexOf(listener), 1);
+        this.listeners[BROADCAST].splice(this.listeners[type].indexOf(listener), 1);
     }
 
     dispatchEvent(event) {
         if (!this.listeners[type.type])
             return;
-        this.listeners[type.type].forEach(listener => listener(event));
+        if (type !== BROADCAST)
+            this.listeners[type.type].forEach(listener => listener(event));
+        this.listeners[BROADCAST].forEach(listener => listener(event));
     }
 
     propagateEvent(event) {

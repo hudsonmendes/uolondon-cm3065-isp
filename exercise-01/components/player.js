@@ -42,5 +42,7 @@ class Player extends Drawable {
         this.waveShaper.draw();
     }
 
+    listenToAnyEvent(listeners) {
 
+    }
 }

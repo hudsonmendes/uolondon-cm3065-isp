@@ -4,6 +4,9 @@
 // playback controls
 let sound;
 
+let player;
+let pipeline;
+
 function preload() {
   sound = loadSound('./assets/sound.mp3');
 }
@@ -11,9 +14,11 @@ function preload() {
 function setup() {
   createCanvas(800, 600);
   background(235);
-  
-  player = new Player({sound});
+
+  pipeline = new Pipeline({ sound });
+  player = new Player({ sound });
   player.setup()
+  player.addEventListener(pipeline.handleEvent);
 }
 
 function draw() {
