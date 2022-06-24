@@ -2,6 +2,7 @@ class Spectrums extends Drawable {
     constructor() {
         super();
         // binds
+        this.setup = this.setup.bind(this);
         this.draw = this.draw.bind(this)
         // controls
         this.spectrumIn = new SpectrumUI({ title: 'spectrum in', x: 560, y: 200 });

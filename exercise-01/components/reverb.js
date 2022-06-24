@@ -1,7 +1,8 @@
-class ReverbUI extends Drawable {
+class Reverb extends Drawable {
     constructor() {
         super();
         // binds
+        this.setup = this.setup.bind(this);
         this.draw = this.draw.bind(this)
         // reverb
         this.rv_durationSlider = null;

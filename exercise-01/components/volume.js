@@ -1,11 +1,16 @@
-class VolumeUI extends Drawable {
+class Volume extends Drawable {
     constructor() {
         super();
         // binds
+        this.setup = this.setup.bind(this);
         this.draw = this.draw.bind(this);
         this.handleVolumeChanged = this.handleVolumeChanged.bind(this);
         // master volume
         this.mv_volumeSlider = null;
+    }
+
+    static get defaultLevel() {
+        return 1.
     }
 
     setup() {
@@ -15,7 +20,7 @@ class VolumeUI extends Drawable {
         textSize(10);
 
         text('level', 560, 105)
-        this.mv_volumeSlider = createSlider(0, 1, 0.5, 0.01);
+        this.mv_volumeSlider = createSlider(0, 1, 1, 0.01);
         this.mv_volumeSlider.position(560, 110);
         this.mv_volumeSlider.input(this.handleVolumeChanged);
     }

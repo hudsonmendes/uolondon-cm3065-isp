@@ -15,10 +15,11 @@ function setup() {
   createCanvas(800, 600);
   background(235);
 
+  player.disconnect();
+
   gui = new GUI({ player });
   gui.setup()
 
-  player.disconnect();
   chain = new Chain();
   gui.addEventListener(chain.handleEvent);
 }

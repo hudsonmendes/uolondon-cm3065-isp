@@ -1,21 +1,21 @@
 class GUI extends Drawable {
-    constructor({ sound: player }) {
+    constructor({ player }) {
         super();
         // binds
         this.draw = this.draw.bind(this);
         // attributes
-        this.sound = player;
+        this.player = player;
         // controls
-        this.playback = new PlaybackUI({ player });
-        this.lowPass = new LowpassUI();
-        this.dynamicCompressor = new DynamicCompressorUI()
-        this.volume = new VolumeUI();
-        this.reverb = new ReverbUI();
-        this.waveShaper = new WaveShaperUI()
+        this.playback = new Playback({ player });
+        this.lowPass = new Lowpass();
+        this.dynamicCompressor = new DynamicCompressor()
+        this.volume = new Volume();
+        this.reverb = new Reverb();
+        this.waveShaper = new WaveShaper()
     }
 
     get isPlaying() {
-        return this.sound && this.sound.isPlaying();
+        return this.player && this.player.isPlaying();
     }
 
     setup() {

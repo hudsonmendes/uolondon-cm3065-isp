@@ -1,7 +1,8 @@
-class PlaybackUI extends Drawable {
+class Playback extends Drawable {
     constructor({ player }) {
         super();
         // binds
+        this.setup = this.setup.bind(this);
         this.draw = this.draw.bind(this);
         this.onPauseClick = this.onPauseClick.bind(this);
         this.onPlayClick = this.onPlayClick.bind(this);

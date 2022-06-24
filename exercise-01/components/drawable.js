@@ -5,6 +5,8 @@ class Drawable {
         if (new.target === Drawable)
             throw new TypeError('Cannot construct abstract class');
         // binds
+        this.setup = this.setup.bind(this);
+        this.draw = this.draw.bind(this);
         this.getEventListenerFor = this.getEventListenerFor.bind(this);
         this.addEventListener = this.addEventListener.bind(this);
         this.removeEventListener = this.addEventListener.bind(this);

@@ -4,7 +4,7 @@ class Chain {
         this.attach = this.process.bind(this);
         this.handleEvent = this.handleEvent.bind(this);
         // attributes
-        this.volumeLevel = 0.5;
+        this.volumeLevel = Volume.defaultLevel;
         // filters
         this.reverbFilter = new p5.Reverb();
     }

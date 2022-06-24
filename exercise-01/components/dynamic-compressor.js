@@ -1,7 +1,8 @@
-class DynamicCompressorUI extends Drawable {
+class DynamicCompressor extends Drawable {
     constructor() {
         super();
         // binds
+        this.setup = this.setup.bind(this);
         this.draw = this.draw.bind(this)
         // dynamic compressor
         this.dc_attackSlider = null;

@@ -1,7 +1,8 @@
-class LowpassUI extends Drawable {
+class Lowpass extends Drawable {
     constructor() {
         super();
         // binds
+        this.setup = this.setup.bind(this);
         this.draw = this.draw.bind(this)
         // low-pass filter
         this.lp_cutOffSlider = null;
