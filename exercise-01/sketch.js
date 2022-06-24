@@ -2,28 +2,28 @@
 // Feel freee to modify it or create your own template
 
 // playback controls
-let sound;
-
 let player;
-let pipeline;
+
+let gui;
+let chain;
 
 function preload() {
-  sound = loadSound('./assets/sound.mp3');
+  player = loadSound('./assets/sound.mp3');
 }
 
 function setup() {
   createCanvas(800, 600);
   background(235);
 
-  pipeline = new Pipeline({ sound });
-  sound.disconnect();
+  gui = new GUI({ player });
+  gui.setup()
 
-  player = new Player({ sound });
-  player.setup()
-  player.addEventListener(pipeline.handleEvent);
+  player.disconnect();
+  chain = new Chain();
+  gui.addEventListener(chain.handleEvent);
 }
 
 function draw() {
-  player.draw()
-  pipeline.process(sound);
+  gui.draw()
+  chain.process(player);
 }

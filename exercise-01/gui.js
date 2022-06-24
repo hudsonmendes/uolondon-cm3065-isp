@@ -1,12 +1,12 @@
-class Player extends Drawable {
-    constructor({ sound }) {
+class GUI extends Drawable {
+    constructor({ sound: player }) {
         super();
         // binds
         this.draw = this.draw.bind(this);
         // attributes
-        this.sound = sound;
+        this.sound = player;
         // controls
-        this.playback = new PlaybackUI({ sound });
+        this.playback = new PlaybackUI({ player });
         this.lowPass = new LowpassUI();
         this.dynamicCompressor = new DynamicCompressorUI()
         this.volume = new VolumeUI();

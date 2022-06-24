@@ -1,4 +1,4 @@
-class Pipeline {
+class Chain {
     constructor() {
         // binds
         this.attach = this.process.bind(this);

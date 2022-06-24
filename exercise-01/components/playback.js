@@ -1,5 +1,5 @@
 class PlaybackUI extends Drawable {
-    constructor({ sound }) {
+    constructor({ player }) {
         super();
         // binds
         this.draw = this.draw.bind(this);
@@ -12,7 +12,7 @@ class PlaybackUI extends Drawable {
         this.onRecordClick = this.onRecordClick.bind(this);
 
         // attributes
-        this.sound = sound;
+        this.player = player;
 
         // Playback controls
         this.pauseButton = null;
@@ -59,29 +59,29 @@ class PlaybackUI extends Drawable {
     }
 
     onPauseClick() {
-        if (!this.sound.isPlaying())
+        if (!this.player.isPlaying())
             console.log("not playing")
         else {
             console.log("plause");
-            this.sound.pause();
+            this.player.pause();
         }
     }
 
     onPlayClick() {
-        if (this.sound.isPlaying())
+        if (this.player.isPlaying())
             console.log("already playing");
         else {
             console.log("play");
-            this.sound.play();
+            this.player.play();
         }
     }
 
     onStopClick() {
-        if (!this.sound.isPlaying())
+        if (!this.player.isPlaying())
             console.log("not playing")
         else {
             console.log("stop");
-            this.sound.stop();
+            this.player.stop();
         }
     }
 
@@ -95,7 +95,7 @@ class PlaybackUI extends Drawable {
 
     onLoopClick() {
         console.log("loop");
-        this.sound.loop();
+        this.player.loop();
     }
 
     onRecordClick() {
