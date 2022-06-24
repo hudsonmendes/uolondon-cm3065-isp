@@ -8,10 +8,10 @@ class GUI extends Drawable {
         // controls
         this.playback = new Playback({ player });
         this.lowPass = new Lowpass();
-        this.dynamicCompressor = new DynamicCompressor()
+        this.dynamicCompressor = new DynamicCompressor();
         this.volume = new Volume();
         this.reverb = new Reverb();
-        this.waveShaper = new WaveShaper()
+        this.waveShaper = new WaveShaper();
     }
 
     get isPlaying() {
@@ -24,9 +24,10 @@ class GUI extends Drawable {
         this.lowPass.setup();
 
         this.dynamicCompressor.setup();
+        this.dynamicCompressor.addEventListener(this.propagateEvent);
 
         this.volume.setup();
-        this.volume.addEventListener('volumeChanged', this.propagateEvent);
+        this.volume.addEventListener(this.propagateEvent);
 
         this.reverb.setup();
 
@@ -40,9 +41,5 @@ class GUI extends Drawable {
         this.volume.draw();
         this.reverb.draw();
         this.waveShaper.draw();
-    }
-
-    listenToAnyEvent(listeners) {
-
     }
 }
