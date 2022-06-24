@@ -16,6 +16,8 @@ function setup() {
   background(235);
 
   pipeline = new Pipeline({ sound });
+  sound.disconnect();
+
   player = new Player({ sound });
   player.setup()
   player.addEventListener(pipeline.handleEvent);
@@ -23,4 +25,5 @@ function setup() {
 
 function draw() {
   player.draw()
+  pipeline.process(sound);
 }

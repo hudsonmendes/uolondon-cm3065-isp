@@ -1,3 +1,0 @@
-class LowpassFilter extends Filter {
-    
-}

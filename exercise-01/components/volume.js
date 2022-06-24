@@ -3,7 +3,7 @@ class VolumeUI extends Drawable {
         super();
         // binds
         this.draw = this.draw.bind(this);
-        this.onVolumeChanged = this.volumeChanged.bind(this);
+        this.handleVolumeChanged = this.handleVolumeChanged.bind(this);
         // master volume
         this.mv_volumeSlider = null;
     }
@@ -24,8 +24,10 @@ class VolumeUI extends Drawable {
     }
 
     handleVolumeChanged(e) {
-        this.dispatchEvent(new Event(
-            'volumeChanged',
-            { volumeLevel: this.mv_volumeSlider.value() }));
+        this.dispatchEvent({
+            type: 'volumeChanged',
+            target: e.target,
+            volumeLevel: this.mv_volumeSlider.value()
+        });
     }
 }

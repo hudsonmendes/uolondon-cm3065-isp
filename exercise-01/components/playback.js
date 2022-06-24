@@ -95,6 +95,7 @@ class PlaybackUI extends Drawable {
 
     onLoopClick() {
         console.log("loop");
+        this.sound.loop();
     }
 
     onRecordClick() {

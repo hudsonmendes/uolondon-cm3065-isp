@@ -1,3 +1,0 @@
-class ReverbFilter extends Filter {
-    
-}

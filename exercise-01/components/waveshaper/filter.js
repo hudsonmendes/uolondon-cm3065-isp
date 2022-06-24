@@ -1,3 +1,0 @@
-class WaveShaperFilter extends Filter {
-    
-}

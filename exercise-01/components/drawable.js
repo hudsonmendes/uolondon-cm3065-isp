@@ -5,6 +5,7 @@ class Drawable {
         if (new.target === Drawable)
             throw new TypeError('Cannot construct abstract class');
         // binds
+        this.getEventListenerFor = this.getEventListenerFor.bind(this);
         this.addEventListener = this.addEventListener.bind(this);
         this.removeEventListener = this.addEventListener.bind(this);
         this.dispatchEvent = this.dispatchEvent.bind(this);
@@ -21,37 +22,41 @@ class Drawable {
         throw new Error('draw() not implemented');
     }
 
-    addEventListener(listener) {
-        this.addEventListener(BROADCAST, listener);
+    getEventListenerFor(type) {
+        if (!this.listeners[type])
+            this.listeners[type] = [];
+        return this.listeners[type]
     }
 
     addEventListener(type, listener) {
-        if (!this.listeners[type])
-            this.listeners[type] = [];
-        if (type !== BROADCAST)
-            this.listeners[type].push(listener);
-        this.listeners[BROADCAST].push(listener);
+        if (!listener) {
+            listener = type;
+            type = BROADCAST;
+        }
+        if (type && listener) {
+            this.getEventListenerFor(BROADCAST).push(listener);
+            if (type !== BROADCAST)
+                this.getEventListenerFor(type).push(listener);
+        }
         return this;
     }
 
-    removeEventListener(listener) {
-        this.removeEventListener(BROADCAST, listener);
-    }
-
     removeEventListener(type, listener) {
-        if (!this.listeners[type])
-            return this;
-        if (type !== BROADCAST)
-            this.listeners[type].splice(this.listeners[type].indexOf(listener), 1);
-        this.listeners[BROADCAST].splice(this.listeners[type].indexOf(listener), 1);
+        if (!type) {
+            listener = type;
+            type = BROADCAST;
+        }
+        if (type && listener) {
+            this.getEventListenerFor(BROADCAST).splice(this.listeners[type].indexOf(listener), 1);
+            if (type !== BROADCAST)
+                this.getEventListenerFor(type).splice(this.listeners[type].indexOf(listener), 1);
+        }
     }
 
     dispatchEvent(event) {
-        if (!this.listeners[type.type])
-            return;
-        if (type !== BROADCAST)
-            this.listeners[type.type].forEach(listener => listener(event));
-        this.listeners[BROADCAST].forEach(listener => listener(event));
+        this.getEventListenerFor(BROADCAST).forEach(listener => listener(event));
+        if (event.type !== BROADCAST)
+            this.getEventListenerFor(event.type).forEach(listener => listener(event));
     }
 
     propagateEvent(event) {

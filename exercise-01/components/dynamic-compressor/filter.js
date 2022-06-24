@@ -1,3 +1,0 @@
-class DynamicCompressorFilter extends Filter {
-    
-}
