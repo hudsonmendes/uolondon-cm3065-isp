@@ -21,10 +21,10 @@ function setup() {
   gui.setup()
 
   chain = new Chain();
+  chain.attach(player);
   gui.addEventListener(chain.handleEvent);
 }
 
 function draw() {
   gui.draw()
-  chain.process(player);
 }

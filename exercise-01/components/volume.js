@@ -20,7 +20,7 @@ class Volume extends Drawable {
         textSize(10);
 
         text('level', 560, 105)
-        this.mv_volumeSlider = createSlider(0, 1, 1, 0.01);
+        this.mv_volumeSlider = createSlider(0, 1, 0.5, 0.01);
         this.mv_volumeSlider.position(560, 110);
         this.mv_volumeSlider.input(this.handleVolumeChanged);
     }
