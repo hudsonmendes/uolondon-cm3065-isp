@@ -45,6 +45,11 @@ var wd_outputSlider
 var effect
 var player
 
+// recording
+var recorder
+var recording
+var outFile
+
 // filters
 var lowpassFilter
 var waveshaperDistortion
@@ -61,6 +66,7 @@ const distortionOversampling = {
 function preload() {
     soundFormats("wav", "mp3")
     player = loadSound("assets/poem")
+    outFile = new p5.SoundFile()
 }
 
 function setup() {
@@ -68,23 +74,8 @@ function setup() {
     background(180)
     setupGUI()
     setupChain()
+    setupRecorder()
     refreshEffects()
-}
-
-function setupChain() {
-    lowpassFilter = new p5.LowPass()
-    //waveshaperDistortion = new p5.Distortion()
-    //dynamicCompressor = new p5.Compressor()
-    //reverbFilter = new p5.Reverb()
-    //masterVolume = new p5.Gain()
-
-    // chain
-    player.disconnect()
-    lowpassFilter.process(player)
-    //waveshaperDistortion.process(lowpassFilter)
-    //dynamicCompressor.process(waveshaperDistortion)
-    //reverbFilter.process(dynamicCompressor)
-    //masterVolume.setInput(reverbFilter)
 }
 
 function setupGUI() {
@@ -109,7 +100,18 @@ function setupGUI() {
     loopButton.mousePressed(() => player.loop())
     recordButton = createButton("record")
     recordButton.position(402, 20)
-    recordButton.mousePressed(() => player.record())
+    recordButton.mousePressed(() => {
+        if (!recording) {
+            recording = true
+            recorder.record(outFile)
+            recordButton.html("stop")
+        } else {
+            recording = false
+            recorder.stop()
+            save(outFile, "output.wav")
+            recordButton.html("record")
+        }
+    })
 
     // Important: you may have to change the slider parameters (min, max, value and step)
 
@@ -206,6 +208,34 @@ function setupGUI() {
     text("spectrum out", 560, 345)
 }
 
+function setupChain() {
+    lowpassFilter = new p5.LowPass()
+    waveshaperDistortion = new p5.Distortion()
+    dynamicCompressor = new p5.Compressor()
+    reverbFilter = new p5.Reverb()
+    masterVolume = new p5.Gain()
+
+    // chain
+    player.disconnect()
+    lowpassFilter.disconnect()
+    lowpassFilter.process(player)
+    waveshaperDistortion.disconnect()
+    waveshaperDistortion.process(lowpassFilter)
+    dynamicCompressor.disconnect()
+    dynamicCompressor.process(waveshaperDistortion)
+    reverbFilter.disconnect()
+    reverbFilter.process(dynamicCompressor)
+    masterVolume.disconnect()
+    masterVolume.setInput(reverbFilter)
+    masterVolume.connect()
+}
+
+function setupRecorder() {
+    recorder = new p5.SoundRecorder()
+    recorder.setInput(masterVolume)
+    recording = false
+}
+
 function draw() {
     refreshEffects()
 }
@@ -215,8 +245,17 @@ function refreshEffects() {
     lowpassFilter.drywet(lp_dryWetSlider.value())
     lowpassFilter.amp(lp_outputSlider.value())
 
-    //waveshaperDistortion.set(wd_amountSlider.value(), distortionOversampling[wd_oversampleSlider.value()])
-    //dynamicCompressor.set(dc_attackSlider.value(), dc_kneeSlider.value(), dc_ratioSlider.value(), dc_thresholdSlider.value(), dc_releaseSlider.value())
-    //reverbFilter.set(rv_durationSlider.value(), rv_decaySlider.value(), false)
-    //masterVolume.amp(mv_volumeSlider.value())
+    waveshaperDistortion.set(wd_amountSlider.value(), distortionOversampling[wd_oversampleSlider.value()])
+    waveshaperDistortion.drywet(wd_dryWetSlider.value())
+    waveshaperDistortion.amp(wd_outputSlider.value())
+
+    dynamicCompressor.set(dc_attackSlider.value(), dc_kneeSlider.value(), dc_ratioSlider.value(), dc_thresholdSlider.value(), dc_releaseSlider.value())
+    dynamicCompressor.drywet(dc_dryWetSlider.value())
+    dynamicCompressor.amp(dc_outputSlider.value())
+
+    reverbFilter.set(rv_durationSlider.value(), rv_decaySlider.value(), false)
+    reverbFilter.drywet(rv_dryWetSlider.value())
+    reverbFilter.amp(rv_outputSlider.value())
+
+    masterVolume.amp(mv_volumeSlider.value())
 }
