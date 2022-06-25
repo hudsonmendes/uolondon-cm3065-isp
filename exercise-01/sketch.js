@@ -257,6 +257,7 @@ function setupRecorder() {
 
 function draw() {
     refreshEffects()
+    refreshSpectrums()
 }
 
 function refreshEffects() {
@@ -277,7 +278,9 @@ function refreshEffects() {
     reverbFilter.amp(rv_outputSlider.value())
 
     masterVolume.amp(mv_volumeSlider.value())
+}
 
+function refreshSpectrums() {
     // spectrums
     const ffts = [fftIn, fftOut]
     for (let fftIndex = 0; fftIndex < ffts.length; fftIndex++) {
