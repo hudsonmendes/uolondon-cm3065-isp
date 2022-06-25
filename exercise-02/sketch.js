@@ -18,15 +18,16 @@ var isPlaying
 
 // visualisation
 var analyzer
+var spectrumAmpMax
 
 function preload() {
     soundFormats("mp3", "wav")
-    soundFile = loadSound("files/Kalte_Ohren_(_Remix_)")
+    soundFile = loadSound("files/Kalte_Ohren_(_Remix_).mp3")
 }
 
 function setup() {
-    createCanvas(800, 600)
-    background(220)
+    createCanvas(1000, 600)
+    background(0)
     setupMeyda()
     setupPlayback()
 }
@@ -78,11 +79,26 @@ function setupButton({ text, color, pos: { x, y } }) {
 
 function draw() {
     // put drawing code here
-    drawSpectrum()
 }
 
-function drawSpectrum() {}
-
 function handleMeydaCallback(features) {
-    console.log(features)
+    // spectrum
+    let spectrum = features.amplitudeSpectrum
+    if (spectrum) drawSpectrum(spectrum)
+}
+
+function drawSpectrum(spectrum) {
+    background(0)
+    let spectrumWidth = width / spectrum.length
+    for (let i = 0; i < spectrum.length; i++) {
+        const amp = spectrum[i]
+        if (!spectrumAmpMax || amp > spectrumAmpMax) spectrumAmpMax = amp
+        const y = map(amp, 0, (spectrumAmpMax * 2) / 3, height / 2, 0)
+        const z = map(amp, 0, spectrumAmpMax, 128, 64)
+        const h = height / 2 - y
+        fill(0, 143, 17, z)
+        rect(i * spectrumWidth, y, spectrumWidth, h)
+        fill(255, 0, 0, z)
+        rect(i * spectrumWidth, height / 2, spectrumWidth, h)
+    }
 }
