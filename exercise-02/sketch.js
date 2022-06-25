@@ -21,11 +21,13 @@ var analyzer
 var rmsReported
 var spectrumReported
 var spectralSpreadHistogram
+var spectralCrestReported
 
 // scalers
 var rmsMax
 var spectrumAmpMax
 var spectralSpreadBoxes
+var spectralCrestMax
 
 function preload() {
     soundFormats("mp3", "wav")
@@ -49,7 +51,7 @@ function setupMeyda() {
         audioContext: getAudioContext(),
         source: soundFile,
         bufferSize: 512,
-        featureExtractors: ["rms", "amplitudeSpectrum", "spectralSpread"],
+        featureExtractors: ["rms", "amplitudeSpectrum", "spectralSpread", "spectralCrest"],
         callback: handleMeydaCallback,
     })
 }
@@ -104,7 +106,7 @@ function draw() {
         Ft: Starfrosch, Kara Square`)
 
     if (rmsReported) {
-        drawRMSLine(rmsReported)
+        drawRMSBass(rmsReported, spectralCrestReported)
     }
 
     if (spectralSpreadHistogram) {
@@ -131,17 +133,20 @@ function drawTitle(title) {
     }
 }
 
-function drawRMSLine(rms) {
-    const minInclination = -PI / 4
+function drawRMSBass(rms, spectralCrest) {
+    const w = width * 1.5
+    const h = map(rms, 0, rmsMax, 100, height / 3)
     try {
         push()
-        const inclination = map(rms, 0, rmsMax, -minInclination, minInclination)
-        translate(width / 2, height / 2)
-        rotate(inclination)
-        stroke(255, 128)
+        translate(width / 2, height)
+        const spectralCrestCutOff = spectralCrestMax / 3
+        const r = map(spectralCrest <= spectralCrestCutOff ? spectralCrest : 0, 0, spectralCrestCutOff, 0, 255)
+        const g = map(spectralCrestCutOff < spectralCrest <= spectralCrestCutOff ? spectralCrest : 0, spectralCrestCutOff, spectralCrestMax, 0, 143)
+        stroke(r, g, 17, 192)
         strokeWeight(1)
-        fill(255, 32)
-        rect(-width, -height, width * 2, height)
+        fill(r, g, 17, 128)
+        ellipseMode(CENTER)
+        ellipse(0, 0, w, h)
     } finally {
         pop()
     }
@@ -206,7 +211,9 @@ function handleMeydaCallback(features) {
 
     // spectrum
     const spectrum = features.amplitudeSpectrum
-    if (spectrum && !spectrumReported) spectrumReported = spectrum
+    if (spectrum && !spectrumReported) {
+        spectrumReported = spectrum
+    }
 
     // spectralSpread
     const spectralSpread = features.spectralSpread
@@ -214,5 +221,12 @@ function handleMeydaCallback(features) {
         const spectralSpreadBox = parseInt(spectralSpread / 10)
         const spectralSpreadBoxBounded = max(0, min(spectralSpreadBoxes - 1, spectralSpreadBox))
         spectralSpreadHistogram[spectralSpreadBoxBounded]++
+    }
+
+    // spectralCrest
+    const spectralCrest = features.spectralCrest
+    if (spectralCrest) {
+        spectralCrestReported = spectralCrest
+        if (!spectralCrestMax || spectralCrestMax < spectralCrest) spectralCrestMax = spectralCrest
     }
 }
