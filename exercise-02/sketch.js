@@ -41,9 +41,8 @@ function setup() {
 function setupMeyda() {
     spectrumAmpMax = 25
 
-    spectralSpreadBoxes = [1, 5]
-    spectralSpreadHistogram = {}
-    for (let i = 0; i < max(spectralSpreadBoxes); i++) spectralSpreadHistogram[i] = 0
+    spectralSpreadBoxes = 7
+    spectralSpreadHistogram = new Array(spectralSpreadBoxes).fill(0)
 
     analyzer = new Meyda.createMeydaAnalyzer({
         audioContext: getAudioContext(),
@@ -122,22 +121,21 @@ function drawSpectrum(spectrum) {
 }
 
 function drawSpectralSpreadHistogram(histogram) {
-    let n = spectralSpreadBoxes[0]
-    let maxCount = 0
-    for (let nBoxes in histogram)
-        if (maxCount < histogram[nBoxes]) {
-            n = nBoxes
-            maxCount = histogram[nBoxes]--
-        }
-    const h = 200
-    const w = h / 2
+    const n = spectralSpreadBoxes
+    const maxCount = Object.keys(histogram).reduce((prev, curr) => max(prev, histogram[curr]), 0)
+    const w = (width * 0.5) / n
     const wfull = n * w
     const x0 = (width - wfull) / 2
-    const y = (height - h) / 2
     fill(0, 143, 17, 128)
     for (let i = 0; i < n; i++) {
-        x = i * w
-        rect(x0 + x, y, w, h)
+        const count = histogram[i]
+        if (count === maxCount) histogram[i]--
+        const h = 200 * (count / maxCount)
+        if (h > 0) {
+            const y = (height - h) / 2
+            x = i * w
+            rect(x0 + x, y, w, h)
+        }
     }
 }
 
@@ -149,9 +147,8 @@ function handleMeydaCallback(features) {
     // spectralSpread
     const spectralSpread = features.spectralSpread
     if (spectralSpread) {
-        const [spectralSpreadBoxesMin, spectralSpreadBoxesMax] = spectralSpreadBoxes
         const spectralSpreadBox = parseInt(spectralSpread / 10)
-        const spectralSpreadBoxBounded = max(spectralSpreadBoxesMin, min(spectralSpreadBoxesMax - 1, spectralSpreadBox))
-        spectralSpreadHistogram[spectralSpreadBoxBounded] += 1
+        const spectralSpreadBoxBounded = max(0, min(spectralSpreadBoxes - 1, spectralSpreadBox))
+        spectralSpreadHistogram[spectralSpreadBoxBounded]++
     }
 }
