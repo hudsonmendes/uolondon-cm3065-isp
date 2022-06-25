@@ -50,11 +50,16 @@ var recorder
 var recording
 var outFile
 
+// ffts
+var fftIn
+var fftOut
+
 // filters
 var lowpassFilter
 var waveshaperDistortion
 var dynamicCompressor
 var reverbFilter
+var reverbIsReversed
 
 // enums
 const distortionOversampling = {
@@ -104,13 +109,14 @@ function setupGUI() {
         if (!recording) {
             recording = true
             recorder.record(outFile)
-            recordButton.html("stop")
         } else {
             recording = false
             recorder.stop()
             save(outFile, "output.wav")
-            recordButton.html("record")
         }
+        recordButton.style("background-color", recording ? "red" : "")
+        recordButton.style("color", recording ? "white" : "")
+        recordButton.html(recording ? "stop recording" : "record")
     })
 
     // Important: you may have to change the slider parameters (min, max, value and step)
@@ -182,8 +188,14 @@ function setupGUI() {
     rv_outputSlider = createSlider(0, 1, 1, 0.01)
     rv_outputSlider.position(10, 470)
     text("output level", 10, 465)
-    rv_reverseButton = createButton("reverb reverse")
+    reverbIsReversed = false
+    rv_reverseButton = createButton(`reverb reverse ${!reverbIsReversed ? "off" : "on"}`)
     rv_reverseButton.position(10, 510)
+    rv_reverseButton.mousePressed(() => {
+        reverbIsReversed = !reverbIsReversed
+        rv_reverseButton.style("background-color", reverbIsReversed ? "blue" : "")
+        rv_reverseButton.html(`reverb reverse ${!reverbIsReversed ? "off" : "on"}`)
+    })
 
     // waveshaper distortion
     textSize(14)
@@ -209,14 +221,20 @@ function setupGUI() {
 }
 
 function setupChain() {
+    // filters
     lowpassFilter = new p5.LowPass()
     waveshaperDistortion = new p5.Distortion()
     dynamicCompressor = new p5.Compressor()
     reverbFilter = new p5.Reverb()
     masterVolume = new p5.Gain()
 
+    // spectrums
+    fftIn = new p5.FFT()
+    fftOut = new p5.FFT()
+
     // chain
     player.disconnect()
+    fftIn.setInput(player)
     lowpassFilter.disconnect()
     lowpassFilter.process(player)
     waveshaperDistortion.disconnect()
@@ -227,6 +245,7 @@ function setupChain() {
     reverbFilter.process(dynamicCompressor)
     masterVolume.disconnect()
     masterVolume.setInput(reverbFilter)
+    fftOut.setInput(masterVolume)
     masterVolume.connect()
 }
 
@@ -253,9 +272,29 @@ function refreshEffects() {
     dynamicCompressor.drywet(dc_dryWetSlider.value())
     dynamicCompressor.amp(dc_outputSlider.value())
 
-    reverbFilter.set(rv_durationSlider.value(), rv_decaySlider.value(), false)
+    reverbFilter.set(rv_durationSlider.value(), rv_decaySlider.value(), reverbIsReversed)
     reverbFilter.drywet(rv_dryWetSlider.value())
     reverbFilter.amp(rv_outputSlider.value())
 
     masterVolume.amp(mv_volumeSlider.value())
+
+    // spectrums
+    const ffts = [fftIn, fftOut]
+    for (let fftIndex = 0; fftIndex < ffts.length; fftIndex++) {
+        const fft = ffts[fftIndex]
+        const spectrum = fft.analyze()
+        push()
+        translate(560, 210 + 145 * fftIndex)
+        scale(0.25, 0.2)
+        noStroke()
+        fill(60)
+        rect(0, 0, width, height)
+        fill(255, 0, 0)
+        for (let i = 0; i < spectrum.length; i++) {
+            const x = map(i, 0, spectrum.length, 0, width)
+            const h = -height + map(spectrum[i], 0, 255, height, 0)
+            rect(x, height, width / spectrum.length, h)
+        }
+        pop()
+    }
 }
