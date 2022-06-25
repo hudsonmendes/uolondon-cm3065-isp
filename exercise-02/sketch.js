@@ -18,11 +18,17 @@ var isPlaying
 
 // visualisation
 var analyzer
+var spectrumReported
+var spectralSpreadHistogram
+
+// scalers
 var spectrumAmpMax
+var spectralSpreadBoxes
 
 function preload() {
     soundFormats("mp3", "wav")
     soundFile = loadSound("files/Kalte_Ohren_(_Remix_).mp3")
+    //soundFile = loadSound("files/Ex2_sound1.wav")
 }
 
 function setup() {
@@ -34,11 +40,16 @@ function setup() {
 
 function setupMeyda() {
     spectrumAmpMax = 25
+
+    spectralSpreadBoxes = [1, 5]
+    spectralSpreadHistogram = {}
+    for (let i = 0; i < max(spectralSpreadBoxes); i++) spectralSpreadHistogram[i] = 0
+
     analyzer = new Meyda.createMeydaAnalyzer({
         audioContext: getAudioContext(),
         source: soundFile,
         bufferSize: 512,
-        featureExtractors: ["amplitudeSpectrum"],
+        featureExtractors: ["amplitudeSpectrum", "spectralSpread"],
         callback: handleMeydaCallback,
     })
 }
@@ -46,9 +57,12 @@ function setupMeyda() {
 function setupPlayback() {
     // playback
     isPlaying = false
+    const textColour = (playing) => (!playing ? "#008F11" : "black")
+    const bgColour = (playing) => (!playing ? "black" : "#008F11")
     btnPlayStop = setupButton({
         text: !isPlaying ? "play" : "stop",
-        color: !isPlaying ? "green" : "red",
+        c: textColour(isPlaying),
+        bg: bgColour(isPlaying),
         pos: { x: width - 60, y: 10 },
     })
     btnPlayStop.mousePressed(() => {
@@ -62,16 +76,17 @@ function setupPlayback() {
             isPlaying = true
         }
         btnPlayStop.html(!isPlaying ? "play" : "stop")
-        btnPlayStop.style("background-color", !isPlaying ? "green" : "red")
+        btnPlayStop.style("color", textColour(isPlaying))
+        btnPlayStop.style("background-color", bgColour(isPlaying))
     })
 }
 
-function setupButton({ text, color, pos: { x, y } }) {
+function setupButton({ text, c, bg, pos: { x, y } }) {
     btn = createButton(text)
-    btn.style("background-color", color)
-    btn.style("border", "solid 1px #fff")
+    btn.style("background-color", bg)
+    btn.style("border", `solid 1px ${c}`)
     btn.style("border-radius", "5px")
-    btn.style("color", "#fff")
+    btn.style("color", c)
     btn.style("padding", "5px 10px")
     btn.style("cursor", "pointer")
     btn.position(x, y)
@@ -80,16 +95,19 @@ function setupButton({ text, color, pos: { x, y } }) {
 
 function draw() {
     // put drawing code here
-}
+    background(0)
 
-function handleMeydaCallback(features) {
-    // spectrum
-    let spectrum = features.amplitudeSpectrum
-    if (spectrum) drawSpectrum(spectrum)
+    if (spectrumReported) {
+        drawSpectrum(spectrumReported)
+        spectrumReported = null
+    }
+
+    if (spectralSpreadHistogram) {
+        drawSpectralSpreadHistogram(spectralSpreadHistogram)
+    }
 }
 
 function drawSpectrum(spectrum) {
-    background(0)
     const spectrumWidth = width / spectrum.length
     for (let i = 0; i < spectrum.length; i++) {
         const amp = spectrum[i]
@@ -98,7 +116,42 @@ function drawSpectrum(spectrum) {
         const h = height / 2 - y
         fill(0, 143, 17, z)
         rect(i * spectrumWidth, y, spectrumWidth, h)
-        fill(255, 0, 0, z)
+        fill(0, 143, 17, min(z, 128))
         rect(i * spectrumWidth, height / 2, spectrumWidth, h)
+    }
+}
+
+function drawSpectralSpreadHistogram(histogram) {
+    let n = spectralSpreadBoxes[0]
+    let maxCount = 0
+    for (let nBoxes in histogram)
+        if (maxCount < histogram[nBoxes]) {
+            n = nBoxes
+            maxCount = histogram[nBoxes]--
+        }
+    const h = 200
+    const w = h / 2
+    const wfull = n * w
+    const x0 = (width - wfull) / 2
+    const y = (height - h) / 2
+    fill(0, 143, 17, 128)
+    for (let i = 0; i < n; i++) {
+        x = i * w
+        rect(x0 + x, y, w, h)
+    }
+}
+
+function handleMeydaCallback(features) {
+    // spectrum
+    const spectrum = features.amplitudeSpectrum
+    if (spectrum && !spectrumReported) spectrumReported = spectrum
+
+    // spectralSpread
+    const spectralSpread = features.spectralSpread
+    if (spectralSpread) {
+        const [spectralSpreadBoxesMin, spectralSpreadBoxesMax] = spectralSpreadBoxes
+        const spectralSpreadBox = parseInt(spectralSpread / 10)
+        const spectralSpreadBoxBounded = max(spectralSpreadBoxesMin, min(spectralSpreadBoxesMax - 1, spectralSpreadBox))
+        spectralSpreadHistogram[spectralSpreadBoxBounded] += 1
     }
 }
