@@ -18,10 +18,12 @@ var isPlaying
 
 // visualisation
 var analyzer
+var rmsReported
 var spectrumReported
 var spectralSpreadHistogram
 
 // scalers
+var rmsMax
 var spectrumAmpMax
 var spectralSpreadBoxes
 
@@ -40,7 +42,6 @@ function setup() {
 
 function setupMeyda() {
     spectrumAmpMax = 25
-
     spectralSpreadBoxes = 7
     spectralSpreadHistogram = new Array(spectralSpreadBoxes).fill(0)
 
@@ -48,7 +49,7 @@ function setupMeyda() {
         audioContext: getAudioContext(),
         source: soundFile,
         bufferSize: 512,
-        featureExtractors: ["amplitudeSpectrum", "spectralSpread"],
+        featureExtractors: ["rms", "amplitudeSpectrum", "spectralSpread"],
         callback: handleMeydaCallback,
     })
 }
@@ -96,13 +97,86 @@ function draw() {
     // put drawing code here
     background(0)
 
-    if (spectrumReported) {
-        drawSpectrum(spectrumReported)
-        spectrumReported = null
+    drawTitle(`
+        Kalte Ohren ( Remix ) by Dysfunction_AL
+        (c) copyright 2019 Licensed under a Creative Commons Attribution (3.0) license.
+        http://dig.ccmixter.org/files/destinazione_altrove/59536
+        Ft: Starfrosch, Kara Square`)
+
+    if (rmsReported) {
+        drawRMSLine(rmsReported)
     }
 
     if (spectralSpreadHistogram) {
         drawSpectralSpreadHistogram(spectralSpreadHistogram)
+    }
+
+    if (spectrumReported) {
+        drawSpectrum(spectrumReported)
+        spectrumReported = null
+    }
+}
+
+function drawTitle(title) {
+    try {
+        push()
+        translate(width / 2, height / 2)
+        noStroke()
+        fill(0, 143, 17, 192)
+        textSize(16)
+        textAlign(CENTER)
+        text(title, 0, -height / 2.5)
+    } finally {
+        pop()
+    }
+}
+
+function drawRMSLine(rms) {
+    const minInclination = -PI / 4
+    try {
+        push()
+        const inclination = map(rms, 0, rmsMax, -minInclination, minInclination)
+        translate(width / 2, height / 2)
+        rotate(inclination)
+        stroke(255, 128)
+        strokeWeight(1)
+        fill(255, 32)
+        rect(-width, -height, width * 2, height)
+    } finally {
+        pop()
+    }
+}
+
+function drawSpectralSpreadHistogram(histogram, rotation = undefined) {
+    const n = spectralSpreadBoxes
+    const wfull = min(width, height) * 0.75
+    const w = wfull / n
+    const calculatePos = (i) => parseInt((i + 1) / 2) * (i % 2 !== 0 ? -1 : 1)
+    const piall = [...Array(n).keys()].map(calculatePos).sort((a, b) => a - b)
+    push()
+    try {
+        translate(width / 2, height / 2)
+        if (rotation) rotate(rotation % (2 * PI))
+        const m = max(histogram)
+        const x0 = -w / 2
+        for (let i = 0; i < n; i++) {
+            const iprime = piall[i]
+            const c = histogram[i]
+            if (c > 0 && c === m) histogram[i]--
+            if (m > 0) {
+                const h = 200 * (c / m)
+                if (!isNaN(h) && h > 0) {
+                    const x = x0 + w * iprime
+                    const y = -h / 2
+                    stroke(0, 143, 17, 192)
+                    strokeWeight(1)
+                    fill(0, 143, 17, 128)
+                    rect(x, y, w, h)
+                }
+            }
+        }
+    } finally {
+        pop()
     }
 }
 
@@ -113,6 +187,8 @@ function drawSpectrum(spectrum) {
         const y = map(amp, 0, spectrumAmpMax * (2 / 3), height / 2, 0)
         const z = map(amp, 0, spectrumAmpMax, 255, 128)
         const h = height / 2 - y
+        stroke(0)
+        strokeWeight(1)
         fill(0, 143, 17, z)
         rect(i * spectrumWidth, y, spectrumWidth, h)
         fill(0, 143, 17, min(z, 128))
@@ -120,26 +196,14 @@ function drawSpectrum(spectrum) {
     }
 }
 
-function drawSpectralSpreadHistogram(histogram) {
-    const n = spectralSpreadBoxes
-    const maxCount = Object.keys(histogram).reduce((prev, curr) => max(prev, histogram[curr]), 0)
-    const w = (width * 0.5) / n
-    const wfull = n * w
-    const x0 = (width - wfull) / 2
-    fill(0, 143, 17, 128)
-    for (let i = 0; i < n; i++) {
-        const count = histogram[i]
-        if (count === maxCount) histogram[i]--
-        const h = 200 * (count / maxCount)
-        if (h > 0) {
-            const y = (height - h) / 2
-            x = i * w
-            rect(x0 + x, y, w, h)
-        }
-    }
-}
-
 function handleMeydaCallback(features) {
+    // rms
+    const rms = features.rms
+    if (rms) {
+        rmsReported = rms
+        if (!rmsMax || rmsMax < rms) rmsMax = rms
+    }
+
     // spectrum
     const spectrum = features.amplitudeSpectrum
     if (spectrum && !spectrumReported) spectrumReported = spectrum
