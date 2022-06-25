@@ -22,7 +22,7 @@ var spectrumAmpMax
 
 function preload() {
     soundFormats("mp3", "wav")
-    soundFile = loadSound("files/Ex2_sound1.wav")
+    soundFile = loadSound("files/Kalte_Ohren_(_Remix_).mp3")
 }
 
 function setup() {
@@ -33,6 +33,7 @@ function setup() {
 }
 
 function setupMeyda() {
+    spectrumAmpMax = 25
     analyzer = new Meyda.createMeydaAnalyzer({
         audioContext: getAudioContext(),
         source: soundFile,
@@ -90,8 +91,6 @@ function handleMeydaCallback(features) {
 function drawSpectrum(spectrum) {
     background(0)
     const spectrumWidth = width / spectrum.length
-    const spectrumMax = spectrum.reduce((a, b) => Math.max(a, b), 0)
-    if (!spectrumAmpMax || spectrumAmpMax < spectrumMax) spectrumAmpMax = spectrumMax
     for (let i = 0; i < spectrum.length; i++) {
         const amp = spectrum[i]
         const y = map(amp, 0, spectrumAmpMax * (2 / 3), height / 2, 0)
