@@ -22,7 +22,7 @@ var spectrumAmpMax
 
 function preload() {
     soundFormats("mp3", "wav")
-    soundFile = loadSound("files/Kalte_Ohren_(_Remix_).mp3")
+    soundFile = loadSound("files/Ex2_sound1.wav")
 }
 
 function setup() {
@@ -89,12 +89,13 @@ function handleMeydaCallback(features) {
 
 function drawSpectrum(spectrum) {
     background(0)
-    let spectrumWidth = width / spectrum.length
+    const spectrumWidth = width / spectrum.length
+    const spectrumMax = spectrum.reduce((a, b) => Math.max(a, b), 0)
+    if (!spectrumAmpMax || spectrumAmpMax < spectrumMax) spectrumAmpMax = spectrumMax
     for (let i = 0; i < spectrum.length; i++) {
         const amp = spectrum[i]
-        if (!spectrumAmpMax || amp > spectrumAmpMax) spectrumAmpMax = amp
-        const y = map(amp, 0, (spectrumAmpMax * 2) / 3, height / 2, 0)
-        const z = map(amp, 0, spectrumAmpMax, 128, 64)
+        const y = map(amp, 0, spectrumAmpMax * (2 / 3), height / 2, 0)
+        const z = map(amp, 0, spectrumAmpMax, 255, 128)
         const h = height / 2 - y
         fill(0, 143, 17, z)
         rect(i * spectrumWidth, y, spectrumWidth, h)
