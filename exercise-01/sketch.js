@@ -49,7 +49,14 @@ var player
 var lowpassFilter
 var waveshaperDistortion
 var dynamicCompressor
-var reverb
+var reverbFilter
+
+// enums
+const distortionOversampling = {
+    0: "none",
+    1: "2x",
+    2: "4x",
+}
 
 function preload() {
     soundFormats("wav", "mp3")
@@ -59,31 +66,25 @@ function preload() {
 function setup() {
     createCanvas(800, 600)
     background(180)
-    setupChain()
     setupGUI()
+    setupChain()
+    refreshEffects()
 }
 
 function setupChain() {
     lowpassFilter = new p5.LowPass()
-    waveshaperDistortion = new p5.Distortion()
-    dynamicCompressor = new p5.Compressor()
-    reverb = new p5.Reverb()
-    masterVolume = new p5.Gain()
-
-    // disconnect everything
-    player.disconnect()
-    lowpassFilter.disconnect()
-    waveshaperDistortion.disconnect()
-    dynamicCompressor.disconnect()
-    masterVolume.disconnect()
+    //waveshaperDistortion = new p5.Distortion()
+    //dynamicCompressor = new p5.Compressor()
+    //reverbFilter = new p5.Reverb()
+    //masterVolume = new p5.Gain()
 
     // chain
-    player.connect(lowpassFilter)
-    lowpassFilter.connect(waveshaperDistortion)
-    waveshaperDistortion.connect(dynamicCompressor)
-    dynamicCompressor.connect(reverb)
-    reverb.connect(masterVolume)
-    masterVolume.connect()
+    player.disconnect()
+    lowpassFilter.process(player)
+    //waveshaperDistortion.process(lowpassFilter)
+    //dynamicCompressor.process(waveshaperDistortion)
+    //reverbFilter.process(dynamicCompressor)
+    //masterVolume.setInput(reverbFilter)
 }
 
 function setupGUI() {
@@ -116,16 +117,16 @@ function setupGUI() {
     textSize(14)
     text("low-pass filter", 10, 80)
     textSize(10)
-    lp_cutOffSlider = createSlider(0, 48000, 24000, 480)
+    lp_cutOffSlider = createSlider(10, 22050, 22050, 10)
     lp_cutOffSlider.position(10, 110)
     text("cutoff frequency", 10, 105)
-    lp_resonanceSlider = createSlider(0, 1, 0.5, 0.01)
+    lp_resonanceSlider = createSlider(0.001, 1000, 1000, 0.01)
     lp_resonanceSlider.position(10, 155)
     text("resonance", 10, 150)
-    lp_dryWetSlider = createSlider(0, 1, 0.5, 0.01)
+    lp_dryWetSlider = createSlider(0, 1, 0, 0.01)
     lp_dryWetSlider.position(10, 200)
     text("dry/wet", 10, 195)
-    lp_outputSlider = createSlider(0, 1, 0.5, 0.01)
+    lp_outputSlider = createSlider(0, 1, 1, 0.01)
     lp_outputSlider.position(10, 245)
     text("output level", 10, 240)
 
@@ -133,25 +134,25 @@ function setupGUI() {
     textSize(14)
     text("dynamic compressor", 210, 80)
     textSize(10)
-    dc_attackSlider = createSlider(0, 1, 0.5, 0.01)
+    dc_attackSlider = createSlider(0, 1, 0.003, 0.001)
     dc_attackSlider.position(210, 110)
     text("attack", 210, 105)
-    dc_kneeSlider = createSlider(0, 1, 0.5, 0.01)
+    dc_kneeSlider = createSlider(0, 40, 30, 1)
     dc_kneeSlider.position(210, 155)
     text("knee", 210, 150)
-    dc_releaseSlider = createSlider(0, 1, 0.5, 0.01)
+    dc_releaseSlider = createSlider(0, 1, 0.25, 0.01)
     dc_releaseSlider.position(210, 200)
     text("release", 210, 195)
-    dc_ratioSlider = createSlider(0, 1, 0.5, 0.01)
+    dc_ratioSlider = createSlider(0, 20, 12, 1)
     dc_ratioSlider.position(210, 245)
     text("ratio", 210, 240)
-    dc_thresholdSlider = createSlider(0, 1, 0.5, 0.01)
+    dc_thresholdSlider = createSlider(-100, 0, 0, 1)
     dc_thresholdSlider.position(360, 110)
     text("threshold", 360, 105)
-    dc_dryWetSlider = createSlider(0, 1, 0.5, 0.01)
+    dc_dryWetSlider = createSlider(0, 1, 0, 0.01)
     dc_dryWetSlider.position(360, 155)
     text("dry/wet", 360, 150)
-    dc_outputSlider = createSlider(0, 1, 0.5, 0.01)
+    dc_outputSlider = createSlider(0, 1, 1, 0.01)
     dc_outputSlider.position(360, 200)
     text("output level", 360, 195)
 
@@ -167,16 +168,16 @@ function setupGUI() {
     textSize(14)
     text("reverb", 10, 305)
     textSize(10)
-    rv_durationSlider = createSlider(0, 1, 0.5, 0.01)
+    rv_durationSlider = createSlider(0, 10, 0, 0.1)
     rv_durationSlider.position(10, 335)
     text("duration", 10, 330)
-    rv_decaySlider = createSlider(0, 1, 0.5, 0.01)
+    rv_decaySlider = createSlider(0, 100, 100, 1)
     rv_decaySlider.position(10, 380)
     text("decay", 10, 375)
-    rv_dryWetSlider = createSlider(0, 1, 0.5, 0.01)
+    rv_dryWetSlider = createSlider(0, 1, 0, 0.01)
     rv_dryWetSlider.position(10, 425)
     text("dry/wet", 10, 420)
-    rv_outputSlider = createSlider(0, 1, 0.5, 0.01)
+    rv_outputSlider = createSlider(0, 1, 1, 0.01)
     rv_outputSlider.position(10, 470)
     text("output level", 10, 465)
     rv_reverseButton = createButton("reverb reverse")
@@ -186,16 +187,16 @@ function setupGUI() {
     textSize(14)
     text("waveshaper distortion", 210, 305)
     textSize(10)
-    wd_amountSlider = createSlider(0, 1, 0.5, 0.01)
+    wd_amountSlider = createSlider(0, 1, 0, 0.01)
     wd_amountSlider.position(210, 335)
     text("distortion amount", 210, 330)
-    wd_oversampleSlider = createSlider(0, 1, 0.5, 0.01)
+    wd_oversampleSlider = createSlider(0, 2, 0, 1)
     wd_oversampleSlider.position(210, 380)
     text("oversample", 210, 375)
-    wd_dryWetSlider = createSlider(0, 1, 0.5, 0.01)
+    wd_dryWetSlider = createSlider(0, 1, 0, 0.01)
     wd_dryWetSlider.position(210, 425)
     text("dry/wet", 210, 420)
-    wd_outputSlider = createSlider(0, 1, 0.5, 0.01)
+    wd_outputSlider = createSlider(0, 1, 1, 0.01)
     wd_outputSlider.position(210, 470)
     text("output level", 210, 465)
 
@@ -206,6 +207,16 @@ function setupGUI() {
 }
 
 function draw() {
-    masterVolume.amp(mv_volumeSlider.value())
+    refreshEffects()
+}
+
+function refreshEffects() {
     lowpassFilter.set(lp_cutOffSlider.value(), lp_resonanceSlider.value())
+    lowpassFilter.drywet(lp_dryWetSlider.value())
+    lowpassFilter.amp(lp_outputSlider.value())
+
+    //waveshaperDistortion.set(wd_amountSlider.value(), distortionOversampling[wd_oversampleSlider.value()])
+    //dynamicCompressor.set(dc_attackSlider.value(), dc_kneeSlider.value(), dc_ratioSlider.value(), dc_thresholdSlider.value(), dc_releaseSlider.value())
+    //reverbFilter.set(rv_durationSlider.value(), rv_decaySlider.value(), false)
+    //masterVolume.amp(mv_volumeSlider.value())
 }

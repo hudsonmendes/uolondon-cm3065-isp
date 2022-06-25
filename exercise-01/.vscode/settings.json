@@ -2,9 +2,10 @@
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "editor.rulers": [120, 155],
     "editor.formatOnSave": true,
     "prettier.singleQuote": false,
-    "prettier.printWidth": 120,
+    "prettier.printWidth": 155,
     "prettier.tabWidth": 4,
     "prettier.quoteProps": "consistent"
 }
