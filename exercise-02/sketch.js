@@ -19,12 +19,14 @@ var isPlaying
 // visualisation
 var analyzer
 var rmsReported
+var spectralCentroidReported
 var amplitudeSpectrumReported
 var spectralSpreadHistogram
 var spectralCrestReported
 
 // scalers
 var rmsMax
+var spectralCentroidMax
 var spectrumAmpMax
 var spectralSpreadBoxes
 var spectralCrestMax
@@ -51,7 +53,7 @@ function setupMeyda() {
         audioContext: getAudioContext(),
         source: soundFile,
         bufferSize: 512,
-        featureExtractors: ["rms", "amplitudeSpectrum", "spectralSpread", "spectralCrest"],
+        featureExtractors: ["rms", "spectralCentroid", "amplitudeSpectrum", "spectralSpread", "spectralCrest"],
         callback: handleMeydaCallback,
     })
 }
@@ -109,6 +111,10 @@ function draw() {
         drawRMSBass(rmsReported, spectralCrestReported)
     }
 
+    if (spectralCentroidReported) {
+        drawSpectralCentroidBg(spectralCentroidReported)
+    }
+
     if (spectralSpreadHistogram) {
         drawSpectralSpreadHistogram(spectralSpreadHistogram)
     }
@@ -150,6 +156,14 @@ function drawRMSBass(rms, spectralCrest) {
     } finally {
         pop()
     }
+}
+
+function drawSpectralCentroidBg(spectralCentroid) {
+    const z = map(spectralCentroid, 0, spectralCentroidMax, 64, 128)
+    noStroke
+    fill(0, 143, 17, z)
+    rect(0, 0, width, height / 2)
+    console.log({ z, spectralCentroid, spectralCentroidMax })
 }
 
 function drawSpectralSpreadHistogram(histogram, rotation = undefined) {
@@ -207,6 +221,13 @@ function handleMeydaCallback(features) {
     if (rms) {
         rmsReported = rms
         if (!rmsMax || rmsMax < rms) rmsMax = rms
+    }
+
+    // spectralCentroid
+    const spectralCentroid = features.spectralCentroid
+    if (spectralCentroid) {
+        spectralCentroidReported = spectralCentroid
+        if (!spectralCentroidMax || spectralCentroidMax < spectralCentroid) spectralCentroidMax = spectralCentroid
     }
 
     // amplitudeSpectrum
