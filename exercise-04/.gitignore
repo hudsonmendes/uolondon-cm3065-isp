@@ -159,6 +159,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# HuggingfaceHub
+# Specifi
 **/model_checkpoints
 **/model_checkpoints/*
+**/pretrained_models
+**/pretrained_models/*
+**/src/*.wav
