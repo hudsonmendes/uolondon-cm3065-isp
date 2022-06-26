@@ -16,5 +16,6 @@
             80,
             120
         ]
-    }
+    },
+    "jupyter.debugJustMyCode": false
 }
