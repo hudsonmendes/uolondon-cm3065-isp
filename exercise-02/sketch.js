@@ -23,6 +23,7 @@ var spectralCentroidReported
 var amplitudeSpectrumReported
 var spectralSpreadHistogram
 var spectralCrestReported
+var loudnessReported
 
 // scalers
 var rmsMax
@@ -30,11 +31,12 @@ var spectralCentroidMax
 var spectrumAmpMax
 var spectralSpreadBoxes
 var spectralCrestMax
+var loudnessMax
 
 function preload() {
     soundFormats("mp3", "wav")
-    //soundFile = loadSound("files/Kalte_Ohren_(_Remix_).mp3")
-    soundFile = loadSound("files/Ex2_sound1.wav")
+    soundFile = loadSound("files/Kalte_Ohren_(_Remix_).mp3")
+    //soundFile = loadSound("files/Ex2_sound2.wav")
 }
 
 function setup() {
@@ -53,7 +55,7 @@ function setupMeyda() {
         audioContext: getAudioContext(),
         source: soundFile,
         bufferSize: 512,
-        featureExtractors: ["rms", "spectralCentroid", "amplitudeSpectrum", "spectralSpread", "spectralCrest"],
+        featureExtractors: ["rms", "spectralCentroid", "amplitudeSpectrum", "spectralSpread", "spectralCrest", "loudness"],
         callback: handleMeydaCallback,
     })
 }
@@ -116,7 +118,7 @@ function draw() {
     }
 
     if (spectralSpreadHistogram) {
-        drawSpectralSpreadHistogram(spectralSpreadHistogram)
+        drawSpectralSpreadHistogram(spectralSpreadHistogram, loudnessReported)
     }
 
     if (amplitudeSpectrumReported) {
@@ -163,19 +165,17 @@ function drawSpectralCentroidBg(spectralCentroid) {
     noStroke
     fill(0, 143, 17, z)
     rect(0, 0, width, height / 2)
-    console.log({ z, spectralCentroid, spectralCentroidMax })
 }
 
-function drawSpectralSpreadHistogram(histogram, rotation = undefined) {
+function drawSpectralSpreadHistogram(histogram, loudnessScaler) {
     const n = spectralSpreadBoxes
-    const wfull = min(width, height) * 0.75
+    const wfull = min(width, height) * map(loudnessScaler, 0, loudnessMax, 0.5, 0.75)
     const w = wfull / n
     const calculatePos = (i) => parseInt((i + 1) / 2) * (i % 2 !== 0 ? -1 : 1)
     const piall = [...Array(n).keys()].map(calculatePos).sort((a, b) => a - b)
     push()
     try {
         translate(width / 2, height / 2)
-        if (rotation) rotate(rotation % (2 * PI))
         const m = max(histogram)
         const x0 = -w / 2
         for (let i = 0; i < n; i++) {
@@ -249,5 +249,12 @@ function handleMeydaCallback(features) {
     if (spectralCrest) {
         spectralCrestReported = spectralCrest
         if (!spectralCrestMax || spectralCrestMax < spectralCrest) spectralCrestMax = spectralCrest
+    }
+
+    // loudness
+    const loudness = features.loudness
+    if (loudness && loudness) {
+        loudnessReported = loudness.total
+        if (!loudnessMax || loudnessMax < loudness.total) loudnessMax = loudness.total
     }
 }
