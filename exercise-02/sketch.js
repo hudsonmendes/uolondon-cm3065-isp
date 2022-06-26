@@ -19,7 +19,7 @@ var isPlaying
 // visualisation
 var analyzer
 var rmsReported
-var spectrumReported
+var amplitudeSpectrumReported
 var spectralSpreadHistogram
 var spectralCrestReported
 
@@ -31,8 +31,8 @@ var spectralCrestMax
 
 function preload() {
     soundFormats("mp3", "wav")
-    soundFile = loadSound("files/Kalte_Ohren_(_Remix_).mp3")
-    //soundFile = loadSound("files/Ex2_sound1.wav")
+    //soundFile = loadSound("files/Kalte_Ohren_(_Remix_).mp3")
+    soundFile = loadSound("files/Ex2_sound1.wav")
 }
 
 function setup() {
@@ -113,9 +113,9 @@ function draw() {
         drawSpectralSpreadHistogram(spectralSpreadHistogram)
     }
 
-    if (spectrumReported) {
-        drawSpectrum(spectrumReported)
-        spectrumReported = null
+    if (amplitudeSpectrumReported) {
+        drawAmplitudeSpectrum(amplitudeSpectrumReported)
+        amplitudeSpectrumReported = null
     }
 }
 
@@ -185,10 +185,10 @@ function drawSpectralSpreadHistogram(histogram, rotation = undefined) {
     }
 }
 
-function drawSpectrum(spectrum) {
-    const spectrumWidth = width / spectrum.length
-    for (let i = 0; i < spectrum.length; i++) {
-        const amp = spectrum[i]
+function drawAmplitudeSpectrum(amplitudeSpectrum) {
+    const spectrumWidth = width / amplitudeSpectrum.length
+    for (let i = 0; i < amplitudeSpectrum.length; i++) {
+        const amp = amplitudeSpectrum[i]
         const y = map(amp, 0, spectrumAmpMax * (2 / 3), height / 2, 0)
         const z = map(amp, 0, spectrumAmpMax, 255, 128)
         const h = height / 2 - y
@@ -209,10 +209,10 @@ function handleMeydaCallback(features) {
         if (!rmsMax || rmsMax < rms) rmsMax = rms
     }
 
-    // spectrum
-    const spectrum = features.amplitudeSpectrum
-    if (spectrum && !spectrumReported) {
-        spectrumReported = spectrum
+    // amplitudeSpectrum
+    const amplitudeSpectrum = features.amplitudeSpectrum
+    if (amplitudeSpectrum && !amplitudeSpectrumReported) {
+        amplitudeSpectrumReported = amplitudeSpectrum
     }
 
     // spectralSpread
