@@ -6,3 +6,4 @@ torch>=1.11.0
 transformers>=4.20.1
 speechbrain>=0.5.11
 pandas
+tqdm
